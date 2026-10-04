@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://apache.org"
+         xmlns:xsi="http://w3.org"
+         xsi:schemaLocation="http://apache.org 
+                             http://apache.org">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <!-- 
+      COORDINADAS DEL PROYECTO 
+      Define la identidad única de tu aplicación dentro del entorno de Maven.
+    -->
+    <groupId>com.example</groupId>
+    <artifactId>project-name</artifactId>
+    <version>1.0.0</version>
+    
+    <!-- 
+      PROPIEDADES DEL PROYECTO 
+      Configura las variables globales, como las versiones de Java y la codificación de archivos.
+    -->
+    <properties>
+        <!-- Indica a Maven que use el compilador de Java 20 -->
+        <maven.compiler.source>20</maven.compiler.source>
+        <!-- Asegura que el código compilado (bytecode) sea compatible con Java 20 -->
+        <maven.compiler.target>20</maven.compiler.target>
+        <!-- Define la codificación UTF-8 para evitar problemas con caracteres especiales y acentos -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+    
+    <!-- 
+      DEPENDENCIAS 
+      Lugar donde se añaden las librerías externas (JARs). 
+      Para este simulador concurrente solo usamos la API nativa de Java, por lo que queda vacío.
+    -->
+    <dependencies>
+        <!-- No necesitas dependencias externas para este ejercicio -->
+    </dependencies>
+    
+    <!-- 
+      CONFIGURACIÓN DEL PROCESO DE COMPILACIÓN 
+      Define cómo debe actuar el compilador de Maven al procesar el código.
+    -->
+    <build>
+        <plugins>
+            <!-- Plugin oficial encargado de compilar el código fuente de Java -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <!-- 
+                      ARGUMENTOS DEL COMPILADOR 
+                      Estas directivas '__add-opens'(_ = -) abren los módulos internos de Java (java.base) 
+                      permitiendo el acceso reflexivo no encapsulado. Esto evita advertencias o bloqueos 
+                      al ejecutar herramientas de concurrencia y plugins antiguos en versiones modernas de Java.
+                    -->
+                    <compilerArgs>
+                        <arg>--add-opens=java.base/java.lang=ALL-UNNAMED</arg>
+                        <arg>--add-opens=java.base/java.nio=ALL-UNNAMED</arg>
+                        <arg>--add-opens=java.base/java.util=ALL-UNNAMED</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <!-- 
+      PERFILES DE EJECUCIÓN (PROFILES) 
+      Permiten crear configuraciones personalizadas que solo se activan cuando se llaman explícitamente.
+    -->
+    <profiles>
+        <!-- 
+          Perfil personalizado 'runMain' 
+          Se activa desde los scripts o la consola usando el parámetro: -PrunMain
+        -->
+        <profile>
+            <id>runMain</id>
+            <build>
+                <plugins>
+                    <!-- 
+                      Plugin encargado de ejecutar aplicaciones Java directamente desde Maven 
+                      sin necesidad de empaquetar primero en un archivo .jar externo.
+                    -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <configuration>
+                            <!-- 
+                              CLASE PRINCIPAL (ENTRY POINT)
+                              Apunta directamente a tu clase 'Main' dentro del paquete 'com.project' 
+                              que es donde reside el método public static void main.
+                            -->
+                            <mainClass>com.project.Main</mainClass>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
